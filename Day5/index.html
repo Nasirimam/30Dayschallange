@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 5 DOM Manipulation + Fetch Demo</title>
+    <style></style>
+  </head>
+  <body>
+    <div>
+      <h1 id="title">Hello</h1>
+      <p>Day 5: JavaScript DOM Manipulation + Fetch API</p>
+
+      <button id="btn">Click Me</button>
+
+      <h3>Products (from Fake Store API)</h3>
+      <ul id="list"></ul>
+    </div>
+
+    <script>
+      const title = document.getElementById("title");
+      const btn = document.getElementById("btn");
+      const list = document.getElementById("list");
+
+      btn.addEventListener("click", () => {
+        title.innerText = "You Clicked ";
+      });
+
+      async function loadProducts() {
+        try {
+          const res = await fetch("https://fakestoreapi.com/product?limit=3");
+          const data = await res.json();
+
+          list.innerHTML = "";
+
+          data.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = `${item.title} — $${item.price}`;
+            list.appendChild(li);
+          });
+        } catch (err) {
+          const li = document.createElement("li");
+          li.textContent = "Failed to load products.";
+          list.appendChild(li);
+          console.error("Fetch error:", err);
+        }
+      }
+
+      loadProducts();
+    </script>
+  </body>
+</html>
