@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home - Weather Forecast</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        width: 400px;
+        text-align: center;
+      }
+      h1 {
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px;
+        margin-top: 10px;
+        width: 90%;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        background: #4facfe;
+        color: white;
+      }
+      button:hover {
+        background: #008cfe;
+      }
+      .weather-card {
+        margin-top: 20px;
+        background: #f4f9ff;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: left;
+      }
+      .alert-box {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        display: none;
+      }
+      .alert-box.warning {
+        background: #ff9800;
+      }
+      .alert-box.danger {
+        background: #f44336;
+      }
+      .alert-box.success {
+        background: #4caf50;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌦️ My Weather Forecast</h1>
+      <div class="weather-card" id="weatherCard">
+        <h2 id="locationName">Loading...</h2>
+        <p><strong>Temperature:</strong> <span id="temp"></span> °C</p>
+        <p><strong>Condition:</strong> <span id="condition"></span></p>
+        <p><strong>Humidity:</strong> <span id="humidity"></span>%</p>
+        <p><strong>Wind:</strong> <span id="wind"></span> kph</p>
+      </div>
+
+      <div class="alert-box" id="alertBox"></div>
+      <button onclick="toggleNotify()">🔔 Notify Me</button>
+    </div>
+
+    <script>
+      const API_KEY = "3e08438113984223a30151820252808"; // WeatherAPI key
+      let notifyEnabled = false;
+
+      const userPhone = localStorage.getItem("userPhone");
+      const userLocation = JSON.parse(localStorage.getItem("userLocation"));
+
+      if (!userPhone || !userLocation) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+      }
+
+      async function fetchWeather() {
+        const res = await fetch(
+          `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${userLocation.lat},${userLocation.lon}`
+        );
+        const data = await res.json();
+
+        const currentWeather = {
+          temp: data.current.temp_c,
+          condition: data.current.condition.text,
+          humidity: data.current.humidity,
+          wind: data.current.wind_kph,
+          location: `${data.location.name}, ${data.location.country}`,
+        };
+
+        document.getElementById("locationName").innerText =
+          currentWeather.location;
+        document.getElementById("temp").innerText = currentWeather.temp;
+        document.getElementById("condition").innerText =
+          currentWeather.condition;
+        document.getElementById("humidity").innerText = currentWeather.humidity;
+        document.getElementById("wind").innerText = currentWeather.wind;
+
+        if (notifyEnabled) checkForAlerts(currentWeather);
+        localStorage.setItem("lastWeather", JSON.stringify(currentWeather));
+      }
+
+      function checkForAlerts(current) {
+        const lastWeather = JSON.parse(localStorage.getItem("lastWeather"));
+        if (!lastWeather) return;
+
+        let alertMsg = "";
+
+        if (
+          current.condition.includes("rain") &&
+          !lastWeather.condition.includes("rain")
+        ) {
+          alertMsg = "☔ Rain is about to start!";
+        } else if (current.condition.toLowerCase().includes("storm")) {
+          alertMsg = "⛈️ Storm warning!";
+        } else if (Math.abs(current.temp - lastWeather.temp) > 5) {
+          alertMsg = "⚠️ Major temperature change detected!";
+        }
+
+        if (alertMsg) {
+          showAlert(alertMsg, "warning");
+          sendWhatsApp(alertMsg);
+        }
+      }
+
+      function toggleNotify() {
+        notifyEnabled = !notifyEnabled;
+        alert(
+          "Notifications " + (notifyEnabled ? "enabled ✅" : "disabled ❌")
+        );
+      }
+
+      function showAlert(msg, type) {
+        const box = document.getElementById("alertBox");
+        box.innerText = msg;
+        box.className = `alert-box ${type}`;
+        box.style.display = "block";
+        setTimeout(() => (box.style.display = "none"), 8000);
+      }
+
+      function sendWhatsApp(message) {
+        const url = `https://wa.me/${userPhone}?text=${encodeURIComponent(
+          message
+        )}`;
+        window.open(url, "_blank");
+      }
+
+      // Fetch weather every 1 min
+      fetchWeather();
+      sendWhatsApp();
+      setInterval(fetchWeather, 60000);
+    </script>
+  </body>
+</html>

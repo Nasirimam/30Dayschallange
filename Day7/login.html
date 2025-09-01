@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - Weather Alert</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #43cea2, #185a9d);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        background: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        width: 360px;
+        text-align: center;
+      }
+      h1 {
+        margin-bottom: 20px;
+      }
+      input,
+      button {
+        padding: 10px;
+        margin: 8px 0;
+        width: 90%;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background: #43cea2;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #2b7a66;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌍 Weather Alert Login</h1>
+      <input
+        type="text"
+        id="phoneNumber"
+        placeholder="Enter WhatsApp number with country code"
+      />
+      <button onclick="saveUser()">Save & Continue</button>
+    </div>
+
+    <script>
+      function saveUser() {
+        const phone = document.getElementById("phoneNumber").value.trim();
+        if (!phone) {
+          alert("Please enter your WhatsApp number");
+          return;
+        }
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+
+            localStorage.setItem("userPhone", phone);
+            localStorage.setItem("userLocation", JSON.stringify({ lat, lon }));
+
+            alert("Saved successfully!");
+            window.location.href = "index.html"; // redirect to home page
+          });
+        } else {
+          alert("Geolocation not supported in this browser");
+        }
+      }
+    </script>
+  </body>
+</html>

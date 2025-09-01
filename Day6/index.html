@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Day 6 - All Events Example</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input, select, button {
+      margin: 8px 0;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="heading">Event Handling Demo</h2>
+
+  <!-- Button Click -->
+  <button id="btn">Click Me</button>
+
+  <!-- OnChange -->
+  <select id="dropdown">
+    <option value="">Select a fruit</option>
+    <option value="apple">Apple</option>
+    <option value="banana">Banana</option>
+    <option value="orange">Orange</option>
+  </select>
+  <p id="selectedFruit"></p>
+
+  <!-- OnInput -->
+  <input type="text" id="inputBox" placeholder="Type something..." />
+  <p id="livePreview"></p>
+
+  <!-- OnSubmit -->
+  <form id="myForm">
+    <input type="text" id="username" placeholder="Enter username" required />
+    <button type="submit">Submit</button>
+  </form>
+  <p id="formResult"></p>
+
+  <script>
+    // onclick
+    document.getElementById("btn").onclick = () => {
+      document.getElementById("heading").innerText = "Button Clicked!";
+    };
+
+    // onchange
+    document.getElementById("dropdown").onchange = (event) => {
+      document.getElementById("selectedFruit").innerText =
+        "You selected: " + event.target.value;
+    };
+
+    // oninput
+    document.getElementById("inputBox").oninput = (event) => {
+      document.getElementById("livePreview").innerText =
+        "Live typing: " + event.target.value;
+    };
+
+    // onsubmit
+    document.getElementById("myForm").onsubmit = (event) => {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      document.getElementById("formResult").innerText =
+        "Form submitted with username: " + username;
+    };
+  </script>
+</body>
+</html>
